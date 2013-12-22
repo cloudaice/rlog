@@ -1,12 +1,11 @@
-package main
+package rlog
 
 import (
 	"errors"
 	"fmt"
-	"io"
-	"log"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/alphazero/redis"
 )
@@ -36,7 +35,7 @@ func NewRlog() *Rlog {
 
 //创建异步对象
 func NewAsyncRlog() *Rlog {
-	RlogHandler := &Rlog{
+	return &Rlog{
 		async:  true,
 		buffer: make(chan []byte, 1024),
 	}
@@ -53,11 +52,12 @@ func (this *Rlog) SetRedis(host string, port int, db int, password string, chann
 	this.channel = channel
 	this.conf = &RedisConf{
 		Host:     host,
-		port:     port,
+		Port:     port,
 		Db:       db,
 		Password: password,
 	}
 	go this.asyncWriter()
+	return
 }
 
 func (this *Rlog) Write(p []byte) (n int, err error) {
@@ -66,6 +66,13 @@ func (this *Rlog) Write(p []byte) (n int, err error) {
 		defer this.lock.Unlock()
 		count, err := this.client.Publish(this.channel, p)
 		return int(count), err
+	} else {
+		select {
+		case this.buffer <- p:
+		case <-time.After(10 * time.Millisecond):
+			fmt.Println(os.Stderr, "Write Buffer Error")
+		}
+		return 0, nil
 	}
 }
 
@@ -73,14 +80,14 @@ func (this *Rlog) recon() {
 	spec := redis.DefaultSpec().Host(this.conf.Host).Port(this.conf.Port).Db(this.conf.Db).Password(this.conf.Password)
 	client, e := redis.NewSynchClientWithSpec(spec)
 	if e != nil {
-		fmt.Fprintln(os.Stdout, "Reconnect Error")
+		fmt.Fprintln(os.Stderr, "Reconnect Error")
 		return
 	}
 	this.client = client
 }
 
 func (this *Rlog) asyncWriter() {
-	for v := range this.buffer {
+	for p := range this.buffer {
 		_, err := this.client.Publish(this.channel, p)
 		if err != nil {
 			this.recon()
