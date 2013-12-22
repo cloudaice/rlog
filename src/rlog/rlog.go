@@ -90,6 +90,7 @@ func (this *Rlog) asyncWriter() {
 	for p := range this.buffer {
 		_, err := this.client.Publish(this.channel, p)
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "Publish Error")
 			this.recon()
 		}
 	}
