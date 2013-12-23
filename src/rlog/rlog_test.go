@@ -16,8 +16,7 @@ const (
 	Password  string = "123456"
 )
 
-func TestRlog(t *testing.T) {
-	rlog := NewRlog()
+func do(rlog *Rlog, t *testing.T) {
 	err := rlog.SetRedis(RedisHost, RedisPort, RedisDb, Password, "TEST_RLOG")
 	if err != nil {
 		t.Error("Can not set Redis")
@@ -43,4 +42,15 @@ func TestRlog(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Error("Time out")
 	}
+
+}
+
+func TestRlog(t *testing.T) {
+	rlog := NewRlog()
+	do(rlog, t)
+}
+
+func TestAsyncRlog(t *testing.T) {
+	rlog := NewAsyncRlog()
+	do(rlog, t)
 }
