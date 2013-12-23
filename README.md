@@ -1,3 +1,7 @@
+
+[![Build Status](https://travis-ci.org/cloudaice/rlog.png?branch=master)](https://travis-ci.org/cloudaice/rlog)
+
+
 远程日志模块
 ------------
 
