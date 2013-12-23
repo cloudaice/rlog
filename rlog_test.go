@@ -12,18 +12,16 @@ import (
 const (
 	RedisHost string = "localhost"
 	RedisPort int    = 6379
-	RedisDb   int    = 8
-	Password  string = "123456"
 )
 
 func do(rlog *Rlog, t *testing.T) {
-	err := rlog.SetRedis(RedisHost, RedisPort, RedisDb, Password, "TEST_RLOG")
+	err := rlog.SetRedis(RedisHost, RedisPort, NODB, NOPASS, "TEST_RLOG")
 	if err != nil {
 		t.Error("Can not set Redis")
 	}
 	log.SetOutput(rlog)
 
-	spec := redis.DefaultSpec().Host(RedisHost).Port(RedisPort).Db(RedisDb).Password(Password)
+	spec := redis.DefaultSpec().Host(RedisHost).Port(RedisPort)
 	client, err := redis.NewPubSubClientWithSpec(spec)
 	if err != nil {
 		t.Error("Can not create pubsub client")
