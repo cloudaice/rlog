@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alphazero/redis"
+	"github.com/cloudaice/rlog/redis"
 )
 
 type RedisConf struct {

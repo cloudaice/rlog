@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alphazero/redis"
+	"github.com/cloudaice/rlog/redis"
 )
 
 const (
