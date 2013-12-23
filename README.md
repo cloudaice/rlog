@@ -70,5 +70,3 @@
 	        	fmt.Println("Receive")
 	        }
 	}
-
-
