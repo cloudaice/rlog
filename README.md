@@ -18,6 +18,8 @@
 
 + 同步写方式
 
+```golang
+
     package main
     
     import (
@@ -69,3 +71,4 @@
         	fmt.Println("Receive")
         }
     }
+```
