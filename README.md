@@ -18,55 +18,54 @@
 
 + 同步写方式
 
+    package main
     
-        package main
-
-        import (
-        	"bytes"
-        	"fmt"
-        	"log"
-        
-        	"github.com/cloudaice/rlog"
-        	"github.com/cloudaice/rlog/redis"
-        )
-        
-        const (
-        	RedisHost string = "localhost"
-        	RedisPort int    = 6379
-        	RedisDb   int    = 8
-        	Password  string = "123456"
-        )
-
-        func main() {
-                /*
-                    创建异步写远程对象
-                    remotelog := rlog.NewAsyncRlog() 
-
-                    创建同步写远程对象
-                    remotelog := rlog.NewRlog()
-                */
-	        remotelog := rlog.NewAsyncRlog()
-	        err := remotelog.SetRedis(RedisHost, RedisPort, RedisDb, Password, "TEST_RLOG")
-	        if err != nil {
-	        	fmt.Println("Set Redis Error")
-	        }
-	        log.SetOutput(remotelog)
-
-	        spec := redis.DefaultSpec().Host(RedisHost).Port(RedisPort).Db(RedisDb).Password(Password)
-	        client, err := redis.NewPubSubClientWithSpec(spec)
-	        if err != nil {
-	        	fmt.Println("Subpub Redis Error")
-	        }
-	        e := client.Subscribe("TEST_RLOG")
-	        if e != nil {
-	        	fmt.Println("Sub Redis Error")
-	        }
-	        subChan := client.Messages("TEST_RLOG")
-	        log.Println("Hello World")
-	        msg := <-subChan
-	        if index := bytes.Index(msg, []byte("Hello World")); index == -1 {
-	        	fmt.Println("Not receive")
-	        } else {
-	        	fmt.Println("Receive")
-	        }
-	}
+    import (
+        "bytes"
+        "fmt"
+        "log"
+    
+        "github.com/cloudaice/rlog"
+        "github.com/cloudaice/rlog/redis"
+    )
+    
+    const (
+        RedisHost string = "localhost"
+        RedisPort int    = 6379
+        RedisDb   int    = 8
+        Password  string = "123456"
+    )
+    
+    func main() {
+        /*
+            创建异步写远程对象
+            remotelog := rlog.NewAsyncRlog() 
+    
+            创建同步写远程对象
+            remotelog := rlog.NewRlog()
+        */
+        remotelog := rlog.NewAsyncRlog()
+        err := remotelog.SetRedis(RedisHost, RedisPort, RedisDb, Password, "TEST_RLOG")
+        if err != nil {
+        	fmt.Println("Set Redis Error")
+        }
+        log.SetOutput(remotelog)
+    
+        spec := redis.DefaultSpec().Host(RedisHost).Port(RedisPort).Db(RedisDb).Password(Password)
+        client, err := redis.NewPubSubClientWithSpec(spec)
+        if err != nil {
+        	fmt.Println("Subpub Redis Error")
+        }
+        e := client.Subscribe("TEST_RLOG")
+        if e != nil {
+        	fmt.Println("Sub Redis Error")
+        }
+        subChan := client.Messages("TEST_RLOG")
+        log.Println("Hello World")
+        msg := <-subChan
+        if index := bytes.Index(msg, []byte("Hello World")); index == -1 {
+        	fmt.Println("Not receive")
+        } else {
+        	fmt.Println("Receive")
+        }
+    }
