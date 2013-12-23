@@ -10,6 +10,11 @@ import (
 	"github.com/cloudaice/rlog/redis"
 )
 
+const (
+	NODB   int    = 0
+	NOPASS string = ""
+)
+
 type RedisConf struct {
 	Host     string
 	Port     int
@@ -42,7 +47,18 @@ func NewAsyncRlog() *Rlog {
 }
 
 func (this *Rlog) SetRedis(host string, port int, db int, password string, channel string) (err error) {
-	spec := redis.DefaultSpec().Host(host).Port(port).Db(db).Password(password)
+	var spec *redis.ConnectionSpec
+	switch {
+	case db == NODB && password == NOPASS:
+		spec = redis.DefaultSpec().Host(host).Port(port)
+	case db == NODB && password != NOPASS:
+		spec = redis.DefaultSpec().Host(host).Port(port).Password(password)
+	case db != NODB && password == NOPASS:
+		spec = redis.DefaultSpec().Host(host).Port(port).Db(db)
+	case db != NODB && password != NOPASS:
+		spec = redis.DefaultSpec().Host(host).Port(port).Db(db).Password(password)
+	}
+
 	client, e := redis.NewSynchClientWithSpec(spec)
 	if e != nil {
 		err = errors.New("Can not create redis connection")
