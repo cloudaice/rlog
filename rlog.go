@@ -92,6 +92,9 @@ func (this *Rlog) Write(p []byte) (n int, err error) {
 	}
 }
 
+/*
+  与redis重新建立连接
+*/
 func (this *Rlog) recon() {
 	spec := redis.DefaultSpec().Host(this.conf.Host).Port(this.conf.Port).Db(this.conf.Db).Password(this.conf.Password)
 	client, e := redis.NewSynchClientWithSpec(spec)
